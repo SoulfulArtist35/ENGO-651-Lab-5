@@ -13,4 +13,4 @@ parameters = "&$select=issueddate,workclassgroup,contractorname,communityname,or
 
 @app.route("/", methods = ["get", "post"])
 def main(): 
-    return render_template("main.html") 
+    return render_template("index.html") 
