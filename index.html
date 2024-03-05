@@ -31,11 +31,14 @@
 
 <body> 
     <h2> Phone Tracker App </h2>
-    <!--MQTT Start/End Buttons-->
-    <button class = "btn btn-success">Start</button>
-    <button class = "btn btn-danger">End</button>
+    <div class = "row">
+        <div class = "col-sm">
+            <!--MQTT Start/End Buttons-->
+            <button class = "btn btn-success">Start</button>
+            <button class = "btn btn-danger">End</button>
+        </div>
 
-    <div id = "map"></div>
+        <div id = "map" , class = "col-lg"></div>
 
     <script>
         var map = L.map('map').setView([51.04440912510035, -114.06310212367659], 11); //Calgary Tower Coordinates (Obtained from Google Maps)
@@ -46,7 +49,7 @@
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map)
 
     </script>
-
+    </div>
 </body>
 
 
