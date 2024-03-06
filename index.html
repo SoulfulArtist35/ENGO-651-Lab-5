@@ -1,6 +1,8 @@
 <!DOCTYPE html> 
 <html>
 <head>
+    <title>Phone Location and Temperature</title>
+
     <!--Link Stylesheets and JS Plugins-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
@@ -26,7 +28,43 @@
     <!--Paho-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js" type="text/javascript"></script>
 
-    <title>Phone Location</title>
+    <!---JS Functions-->
+    <script>
+
+        //Device Position      
+        function success(pos) {
+        console.log(pos); //Log position to console
+        navigator.geolocation.clearWatch(id);
+        } 
+
+
+        //MQTT Functions
+        var MQTT;
+        var Reconnecttimeout = 5000;
+        var host = "10.0.0.242";
+        var port = 9001;
+
+        function onConnect(){
+            console.log("Connection Established");
+        } 
+
+        function MQTTConnect(){
+            console.log("connecting to "+ host+ " on " + port);
+            var rand = Math.floor(Math.random()*10000);
+            var cname = "Desktop" + rand;
+            MQTT = new Paho.MQTT.Client(host, port, cname);  
+
+            var options = {
+            timeout: 10,
+            onSuccess: onConnect 
+            };
+
+            MQTT.connect(options);
+        }; 
+
+
+    </script>
+
 </head>
 
 <body> 
@@ -46,8 +84,12 @@
         //Base Layer 
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 18,
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map)
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map) 
 
+
+        id = navigator.geolocation.watchPosition(success);
+
+        MQTTConnect();
     </script>
     </div>
 </body>
