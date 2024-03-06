@@ -44,7 +44,7 @@
         var host = "127.0.0.1";
         var port = 9090;
 
-        function onConnect(){
+        function ConnectEstab(){
             console.log("Connection Established");
             mqtt.subscribe('sensor')
             message = new Paho.MQTT.Message("Hello World");
@@ -60,7 +60,7 @@
 
             var options = {
             timeout: 2,
-            onSuccess: onConnect()
+            onSuccess: ConnectEstab
                     };
 
             mqtt.connect(options);
