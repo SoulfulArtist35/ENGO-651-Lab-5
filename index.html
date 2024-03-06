@@ -43,25 +43,35 @@
         var reconnectTimeout = 2000;
 
         //Online Host
-        //var host = "test.mosquitto.org";
-        //var port = 8080;
+        var host = "test.mosquitto.org";
+        var port = 8081; //encrypted, unauthentication
+        //var port = 8091; //encrypted, authenticated
 
         //Local Host
-        var host = "localhost"
-        var port = 1883;
+        //var host = "localhost"
+        //var port = 1883;
          
 
         function onConnect(){
            console.log("Connected");
+           document.getElementById("conn_stat").innerHTML= "Connection Successful"
            message = new Paho.MQTT.Message("Hello World");
            message.destinationName = 'sensor1';
            mqtt.send(message);
+        } 
+        
+        function onFailure(message){
+            console.log("Lost Connection");
+            document.getElementById("conn_stat").innerHTML= "Connection Lost, Reestablishing Connection";
+            conn_flag = 0;
         }
 
         function MQTTconnect() {
             console.log("connecting to " + host + " on " + port);
             mqtt = new Paho.MQTT.Client(host, port, "clientjs");
             var options = {
+                useSSL: true,
+                cleanSession: true,
                 timeout: 3,
                 onSuccess: onConnect,
             };  
@@ -76,6 +86,8 @@
     <h2> Phone Tracker App </h2>
     <div class = "row">
         <div class = "col-sm">
+            <h3>Connection Status</h3>
+            <div id = "conn_stat">Not Connected</div>
             <!--MQTT Start/End Buttons-->
             <button class = "btn btn-success">Start</button>
             <button class = "btn btn-danger">End</button>
@@ -94,7 +106,7 @@
 
         //id = navigator.geolocation.watchPosition(success);
 
-        MQTTconnect();
+        MQTTconnect(); 
     </script>
     </div>
 </body>
