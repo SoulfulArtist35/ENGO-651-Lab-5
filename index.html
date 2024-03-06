@@ -39,27 +39,31 @@
 
 
         //MQTT Functions
-        var MQTT;
-        var Reconnecttimeout = 5000;
-        var host = "10.0.0.242";
-        var port = 9001;
+        var mqtt;
+        var Reconnecttimeout = 4000;
+        var host = "127.0.0.1";
+        var port = 9090;
 
         function onConnect(){
             console.log("Connection Established");
+            mqtt.subscribe('sensor')
+            message = new Paho.MQTT.Message("Hello World");
+            message.destinationName = 'sensor';
+            mqtt.send(message);
         } 
 
         function MQTTConnect(){
             console.log("connecting to "+ host+ " on " + port);
             var rand = Math.floor(Math.random()*10000);
             var cname = "Desktop" + rand;
-            MQTT = new Paho.MQTT.Client(host, port, cname);  
+            mqtt = new Paho.MQTT.Client(host, port, cname);  
 
             var options = {
-            timeout: 10,
-            onSuccess: onConnect 
-            };
+            timeout: 2,
+            onSuccess: onConnect()
+                    };
 
-            MQTT.connect(options);
+            mqtt.connect(options);
         }; 
 
 
@@ -87,7 +91,7 @@
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map) 
 
 
-        id = navigator.geolocation.watchPosition(success);
+        //id = navigator.geolocation.watchPosition(success);
 
         MQTTConnect();
     </script>
