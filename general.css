@@ -1,7 +1,6 @@
 
 #map {
     height: 1000px;
-    width: 1000px;
     margin: 25px; 
     align-content: center;
 }
@@ -27,4 +26,13 @@ body{
 
 h2, h3, h4 {
     color: red;
+} 
+
+#conn_stat, #conn_now{
+    font-size: larger;
+    font-weight: 800px;
+} 
+
+.btn{
+    font-weight:800px; 
 }
