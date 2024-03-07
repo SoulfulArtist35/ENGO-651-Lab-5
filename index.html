@@ -167,10 +167,10 @@
                     SSL_count = 0;
                 }
             };
-
+            var clientID = "clientjs" + Math.floor(Math.random()*1000000);
             console.log("Connecting to " + host + " on " + port);
             document.getElementById("conn_stat").innerHTML= "Connecting to " + host + " on " + port;
-            mqtt = new Paho.MQTT.Client(host, port, "clientjs");
+            mqtt = new Paho.MQTT.Client(host, port, clientID);
             var options = {
                 useSSL: Flag_SSL, //authentication
                 cleanSession: true, 
