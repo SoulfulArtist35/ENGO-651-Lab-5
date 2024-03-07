@@ -2,7 +2,7 @@
 #map {
     height: 1000px;
     margin: 25px; 
-    align-content: center;
+    align-content: left;
 }
 
 body{
@@ -11,10 +11,11 @@ body{
     margin: 50px;
 }  
 
-@media (max-width: 400px){
+@media (max-width: 600px){
     body{
         margin: 10px;
-        padding: 5px;
+        padding: 10px; 
+        padding-right: 55px;
     } 
 
     map{
@@ -35,4 +36,4 @@ h2, h3, h4 {
 
 .btn{
     font-weight:800px; 
-}
+} 
