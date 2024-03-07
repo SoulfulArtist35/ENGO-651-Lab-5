@@ -31,31 +31,42 @@
     <!---JS Functions-->
     <script type = "text/javascript">
 
+        //Location Parameter
+
         //Device Position      
         function success(pos) {
-        console.log(pos); //Log position to console
-        navigator.geolocation.clearWatch(id);
+            lat = pos["coords"]["latitude"];
+            long = pos["coords"]["longitude"]
+            console.log(lat + " " + long)
+            navigator.geolocation.clearWatch(id);
         } 
 
         //Forms
         //To Connect
-        var toConnect_Form = '<form name = "connect_parameters">' +
-            '<p>Host: <input type ="text", value = "test.mosquitto.org", name = "MQTT_host"></p>' + 
-            '<p>Port: <input type= "number" , value = "8081", name = "MQTT_port"></p>' + 
-            '<p>Use SSL <input type="checkbox", name ="Use_SSL", value="true" checked></p>' +
-            '<button class = "btn btn-success", onclick="return host, port, Flag_SSL = MQTTconnect()">Connect</button></form>';
+        var toConnect_Form = `<form name = "connect_parameters">
+            <p>Host: <input type ="text", value = "test.mosquitto.org", name = "MQTT_host"></p>  
+            <p>Port: <input type= "number" , value = "8081", name = "MQTT_port"></p> 
+            <p>Use SSL <input type="checkbox", name ="Use_SSL", value="true" checked></p>
+            <button class = "btn btn-success", onclick="return host, port, Flag_SSL = MQTTconnect()">Connect</button></form>`;
 
         //While Connected    
-        var Connected_Form = "<p></p>";  
+        var Connected_Form = "<p></p>";
+        var Disconnected_Form = "<p></p>";  
 
-        var Subscribe_Form = '<h3>Subscribe to Topic</h3>' +
-            '<p><form name ="subscribe_topic", onsubmit="return subscribe()">' +
-            '<input type="text", placeholder = "topic", name = "in_topic">' + 
-            '<p></p>' +
-            '<p><button class = "btn btn-secondary">Topic Subscribe</button></p>' +
-            '</form></p> '; 
+        var Subscribe_Form = `<h3>Subscribe to Topic</h3> 
+            <p><form name ="subscribe_topic", onsubmit="return subscribe()">
+            <input type="text", placeholder = "topic", name = "in_topic"> 
+            <p></p>
+            <p><button class = "btn btn-secondary">Topic Subscribe</button></p>
+            </form></p>`; 
 
-        var Publish_Form = " ";
+        var Publish_Form = `<h3>Publish a Message</h3>
+            <p><form name ="publish_message", onsubmit="return publish()">
+            <input type="text", placeholder = "topic", name = "topic"> 
+            <input type="text", placeholder = "message", name = "msg">
+            <p></p>
+            <p><button class = "btn btn-primary">Publish</button></p>
+            </form></p>`; 
 
 
 
@@ -64,23 +75,25 @@
         var reconnectTimeout = 2000; 
         var flag_connect = 2; 
 
-        var host 
-        var port 
+        var host; 
+        var port; 
         var Flag_SSL = true; 
-        var SSL_count
+        var SSL_count; 
+        var Map_topic = 'ENGO651/Ryan/my_temp';
 
         //MQTT Functions
         function onConnect(){
-           console.log("Connected"); 
-           mqtt.subscribe('ryan/651/mytest')
-           document.getElementById("conn_stat").innerHTML= "Connection Established";
-           document.getElementById("conn_now").innerHTML= Connected_Form;
-           document.getElementById("topic_subscribe").innerHTML= Subscribe_Form;
-           flag_connect = 1;
-           //message_payload = str({"msg" : "Connection Successful"})
-           message = new Paho.MQTT.Message("Connection Successful");
-           message.destinationName = 'ryan/651/mytest';
-           mqtt.send(message);
+            console.log("Connected"); 
+            mqtt.subscribe(Map_topic)// Automatically subscribe to map topic
+            document.getElementById("conn_stat").innerHTML= "Connection Established";
+            document.getElementById("conn_now").innerHTML= Connected_Form;
+            document.getElementById("topic_subscribe").innerHTML= Subscribe_Form;
+            document.getElementById("publish_msg").innerHTML= Publish_Form;
+            flag_connect = 1;
+            //message_payload = str({"msg" : "Connection Successful"})
+            message = new Paho.MQTT.Message("Connection Successful");
+            message.destinationName = 'ryan/651/mytest';
+            mqtt.send(message);
         } 
         
         function disconnect(){
@@ -90,6 +103,8 @@
                 console.log("Disconnected")
                 document.getElementById("conn_stat").innerHTML= "Disconnected";
                 document.getElementById("conn_now").innerHTML= toConnect_Form;
+                document.getElementById("topic_subscribe").innerHTML= Disconnected_Form;
+                document.getElementById("publish_msg").innerHTML= Disconnected_Form;
             }
         }
         function onFailure(message){
@@ -119,10 +134,21 @@
 
         function onMessageArrived(r_message){
             msg = r_message.payloadString;
-            topic = r_message.destinationName;
-            console.log(msg);
-            document.getElementById("mess").innerHTML= "<p>Topic: "+ topic+ "</p>Message: " + msg + "</p>"
+            topic = r_message.destinationName; 
+            if (topic == Map_topic){
+                //Get Information out of JSON
+                msg = JSON.parse(msg);
+                var coords = msg["geometry"]['coordinates'];
+                var prop = msg["properties"]["temp"];
+                popup_message = "My Temp is: " + prop
 
+                var marker = L.marker(coords).addTo(map).bindPopup(popup_message); 
+
+            }
+            else{
+                console.log(msg);
+                document.getElementById("mess").innerHTML= '<h3>Last Message</h3>' + "<p>Topic: "+ topic+ "</p>Message: " + msg + "</p>"
+            }
         }
 
         function MQTTconnect() {
@@ -130,7 +156,7 @@
             if (flag_connect == 2){
                 host = document.forms["connect_parameters"]["MQTT_host"].value;
                 port = Number(document.forms["connect_parameters"]["MQTT_port"].value);
-             
+                
                 if (document.forms["connect_parameters"]["Use_SSL"].checked){
                     Flag_SSL = true;
                     SSL_count = 1;
@@ -159,16 +185,64 @@
 
         return false;
         
+        }  
+
+        //Obtain Device Position      
+        function success(pos) {
+            //User Location
+            lat = pos["coords"]["latitude"];
+            long = pos["coords"]["longitude"];
+            console.log("User Location:" + lat + " " + long)
+
+            //Temp (Create a random value between -40 and 60 (deg C) to 0.1 deg accuracy) 
+            temp = Math.round(Math.random()*1000-400)/10;
+            console.log("My Temperature is " + temp) 
+
+            //Generate GeoJSON Message
+            var Geomsg = `{ "type": "Feature", 
+                "geometry": { "type": "Point", "coordinates" : [${lat}, ${long}] },
+                 "properties": {"temp": ${temp}}}`
+            
+            //Publish Message
+            message = message = new Paho.MQTT.Message(Geomsg);
+            message.destinationName = Map_topic;
+            mqtt.send(message);
+
+            navigator.geolocation.clearWatch(id);
         } 
+
+        //Connected Functions 
 
         function subscribe(){
             console.log("Subscribing") 
             var sub_topic = document.forms["subscribe_topic"]["in_topic"].value;
-            mqtt.subscribe(sub_topic)
+            mqtt.subscribe(sub_topic) 
+            if (sub_topic = Map_topic){
+                id = navigator.geolocation.watchPosition(success);
+            }
             console.log("Successfully subscribed to " + sub_topic) 
+            return false
+        } 
+
+        function publish(){
+            console.log("publishing");
+            var msg = document.forms["publish_message"]["msg"].value;
+            var topic = document.forms["publish_message"]["topic"].value;
+            message = new Paho.MQTT.Message(msg);
+            message.destinationName = topic;
+            mqtt.send(message);
+            console.log("Successfully Sent"); 
+
             return false
         }
 
+        function share_status(){
+            console.log("Sharing Status");
+            //Get location data 
+            id = navigator.geolocation.watchPosition(success);
+        } 
+
+        
 
     </script>
 
@@ -188,13 +262,21 @@
 
             <!--Disconnect Button-->
             <button class = "btn btn-danger", onclick = "disconnect()">End Connection</button> 
+            <p></p>
+
+            <!--Share My Status Button-->
+            <p id = "status_share"></p>
+            <button class = "btn btn-warning", onclick="share_status()">Share My Status</button>
 
             <!--Subscribe to Topic Form (Show onConnect Function)--> 
             <p id ="topic_subscribe"></p>       
             <p></p> 
 
             <!--Publish Message Form--> 
-            <h3>Last Message</h3>
+            <p id ="publish_msg"></p>       
+            <p></p>
+
+            <!--Last Message Display--> 
             <p id = "mess"></p>
             </p>
         </div>
@@ -204,6 +286,8 @@
     <script>  
         document.getElementById("conn_stat").innerHTML= "Not Connected"
         document.getElementById("conn_now").innerHTML= toConnect_Form;  
+
+
         
         var map = L.map('map').setView([51.04440912510035, -114.06310212367659], 11); //Calgary Tower Coordinates (Obtained from Google Maps)
 
@@ -217,8 +301,7 @@
 
     </script>
     </div>
+
 </body>
-
-
 
 </html>
