@@ -31,15 +31,53 @@
     <!---JS Functions-->
     <script type = "text/javascript">
 
-        //Location Parameter
+        //Map Colored Icons
+        //Custom Icon to Adjust Aesthetics 
+        //Reference: V. Agafonkin, CloudMade and T. Pointhuber, "Leaflet-Color-Markers." n.d. 
+        //[Online]. Available: https://github.com/pointhi/leaflet-color-markers?tab=readme-ov-file
+        var red_icon = new L.Icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        }); 
 
-        //Device Position      
-        function success(pos) {
-            lat = pos["coords"]["latitude"];
-            long = pos["coords"]["longitude"]
-            console.log(lat + " " + long)
-            navigator.geolocation.clearWatch(id);
-        } 
+        var blue_icon = new L.Icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        }); 
+        
+        var green_icon = new L.Icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
+
+        function Iconcolor(temp){
+            if (temp> 10){
+                markicon = green_icon;
+            };
+
+            if (temp<= 10){
+                markicon = blue_icon;
+            };
+
+            if (temp >= 30){
+                markicon = red_icon;
+
+            }
+
+            return markicon;
+        }
 
         //Forms
         //To Connect
@@ -139,10 +177,11 @@
                 //Get Information out of JSON
                 msg = JSON.parse(msg);
                 var coords = msg["geometry"]['coordinates'];
-                var prop = msg["properties"]["temp"];
-                popup_message = "My Temp is: " + prop
+                var temp = msg["properties"]["temp"];
+                popup_message = "My Temp is: " + temp
+                markicon = Iconcolor(temp);
 
-                var marker = L.marker(coords).addTo(map).bindPopup(popup_message); 
+                var marker = L.marker(coords, {icon: markicon}).addTo(map).bindPopup(popup_message); 
 
             }
             else{
@@ -187,16 +226,22 @@
         
         }  
 
-        //Obtain Device Position      
-        function success(pos) {
+        function Userlocation(pos){
             //User Location
             lat = pos["coords"]["latitude"];
             long = pos["coords"]["longitude"];
-            console.log("User Location:" + lat + " " + long)
 
             //Temp (Create a random value between -40 and 60 (deg C) to 0.1 deg accuracy) 
-            temp = Math.round(Math.random()*1000-400)/10;
-            console.log("My Temperature is " + temp) 
+            temp = Math.round(Math.random()*1000-400)/10;  
+
+            markicon = Iconcolor(temp);
+
+            return [lat, long, temp, markicon]
+        }
+
+        //Obtain Device Position      
+        function Sharesuccess(pos) {
+            [lat, long, temp, markicon] = Userlocation(pos);
 
             //Generate GeoJSON Message
             var Geomsg = `{ "type": "Feature", 
@@ -209,7 +254,15 @@
             mqtt.send(message);
 
             navigator.geolocation.clearWatch(id);
-        } 
+        }  
+
+        function success(pos){
+            [lat, long, temp, markicon] = Userlocation(pos);
+            popup_message = "My Temp is: " + temp
+            var marker = L.marker([lat, long], {icon: markicon}).addTo(map).bindPopup(popup_message); 
+
+
+        }
 
         //Connected Functions 
 
@@ -218,7 +271,7 @@
             var sub_topic = document.forms["subscribe_topic"]["in_topic"].value;
             mqtt.subscribe(sub_topic) 
             if (sub_topic = Map_topic){
-                id = navigator.geolocation.watchPosition(success);
+                id = navigator.geolocation.getCurrentPosition(success);
             }
             console.log("Successfully subscribed to " + sub_topic) 
             return false
@@ -239,7 +292,7 @@
         function share_status(){
             console.log("Sharing Status");
             //Get location data 
-            id = navigator.geolocation.watchPosition(success);
+            id = navigator.geolocation.getCurrentPosition(Sharesuccess);
         } 
 
         
@@ -297,7 +350,7 @@
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map) 
 
 
-        //id = navigator.geolocation.watchPosition(success);
+        //id = navigator.geolocation.getCurrentPosition(success);
 
     </script>
     </div>
