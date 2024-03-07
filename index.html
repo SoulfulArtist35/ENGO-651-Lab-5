@@ -28,9 +28,7 @@
     <!--Paho-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js" type="text/javascript"></script>
 
-    <!--MQTT Functions-->
-    <script type = "module">
-    </script>
+
     <!---JS Functions-->
     <script type = "text/javascript">
         //Map Colored Icons
@@ -132,6 +130,7 @@
         var Status_button = `<button class = "btn btn-warning", onclick="share_status()">
             Share My Status</button>` 
 
+        var Error_status = '<p> Please enter a host address </p>'
 
 
         //MQTT Required Parameters
@@ -214,22 +213,31 @@
 
             if (flag_connect == 2){
                 host = document.forms["connect_parameters"]["MQTT_host"].value;
-                port = Number(document.forms["connect_parameters"]["MQTT_port"].value);
+                if (host!=  ""){
+                    port = Number(document.forms["connect_parameters"]["MQTT_port"].value);
                 
-                if (document.forms["connect_parameters"]["Use_SSL"].checked){
-                    Flag_SSL = true;
-                    SSL_count = 1;
+                    if (document.forms["connect_parameters"]["Use_SSL"].checked){
+                        Flag_SSL = true;
+                        SSL_count = 1;
+                    }
+
+                    if (!document.forms["connect_parameters"]["Use_SSL"].checked)
+                    {
+                        Flag_SSL = false; 
+                        SSL_count = 0;
+                    }
                 }
-                if (!document.forms["connect_parameters"]["Use_SSL"].checked)
-                {
-                    Flag_SSL = false; 
-                    SSL_count = 0;
+                else{
+                    //Get User to Input Parameters Again
+                    return true;
                 }
             };
             var clientID = "clientjs" + Math.floor(Math.random()*1000000);
             console.log("Connecting to " + host + " on " + port);
             document.getElementById("conn_stat").innerHTML= "Connecting to " + host + " on " + port;
             mqtt = new Paho.MQTT.Client(host, port, clientID);
+    
+            
             var options = {
                 useSSL: Flag_SSL, //authentication
                 cleanSession: true, 
@@ -240,7 +248,7 @@
             mqtt.onConnectionLost = onLostConnection;
             mqtt.onMessageArrived = onMessageArrival;
 
-        mqtt.connect(options); 
+         mqtt.connect(options); 
 
         return false;
         
@@ -301,6 +309,9 @@
             console.log("publishing");
             var msg = document.forms["publish_message"]["msg"].value;
             var topic = document.forms["publish_message"]["topic"].value;
+            if (topic == ""){
+                topic = "Ryan/testing"
+            }
             message = new Paho.MQTT.Message(msg);
             message.destinationName = topic;
             mqtt.send(message);
