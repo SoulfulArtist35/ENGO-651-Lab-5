@@ -37,27 +37,46 @@
         navigator.geolocation.clearWatch(id);
         } 
 
+        //Forms
+        //To Connect
+        var toConnect_Form = '<form name = "connect_parameters">' +
+            '<p>Host: <input type ="text", value = "test.mosquitto.org", name = "MQTT_host"></p>' + 
+            '<p>Port: <input type= "number" , value = "8081", name = "MQTT_port"></p>' + 
+            '<p>Use SSL <input type="checkbox", name ="Use_SSL", value="true" checked></p>' +
+            '<button class = "btn btn-success", onclick="return host, port, Flag_SSL = MQTTconnect()">Connect</button></form>';
 
-        //MQTT Required Functions
+        //While Connected    
+        var Connected_Form = "<p></p>";  
+
+        var Subscribe_Form = '<h3>Subscribe to Topic</h3>' +
+            '<p><form name ="subscribe_topic", onsubmit="return subscribe()">' +
+            '<input type="text", placeholder = "topic", name = "in_topic">' + 
+            '<p></p>' +
+            '<p><button class = "btn btn-secondary">Topic Subscribe</button></p>' +
+            '</form></p> '; 
+
+        var Publish_Form = " ";
+
+
+
+        //MQTT Required Parameters
         var mqtt;
-        var reconnectTimeout = 2000;
+        var reconnectTimeout = 2000; 
+        var flag_connect = 2; 
 
-        //Online Host
-        var host = "test.mosquitto.org";
-        var port = 8081; //encrypted, unauthentication
-        var Flag_SSL = true
-        //var port = 8091; //encrypted, authenticated
+        var host 
+        var port 
+        var Flag_SSL = true; 
+        var SSL_count
 
-        //Local Host
-        //var host = "localhost"
-        //var port = 1883;
-         
-
+        //MQTT Functions
         function onConnect(){
            console.log("Connected"); 
            mqtt.subscribe('ryan/651/mytest')
            document.getElementById("conn_stat").innerHTML= "Connection Established";
-           conn_flag = 1;
+           document.getElementById("conn_now").innerHTML= Connected_Form;
+           document.getElementById("topic_subscribe").innerHTML= Subscribe_Form;
+           flag_connect = 1;
            //message_payload = str({"msg" : "Connection Successful"})
            message = new Paho.MQTT.Message("Connection Successful");
            message.destinationName = 'ryan/651/mytest';
@@ -65,26 +84,37 @@
         } 
         
         function disconnect(){
-            if (conn_flag == 1) {
-                conn_flag = 0;
+            if (flag_connect == 1) {
+                flag_connect = 2;
                 mqtt.disconnect();
                 console.log("Disconnected")
-                document.getElementById("conn_stat").innerHTML= "Disconnected from "  + host + " on " + port;
+                document.getElementById("conn_stat").innerHTML= "Disconnected";
+                document.getElementById("conn_now").innerHTML= toConnect_Form;
             }
         }
         function onFailure(message){
             console.log("Failed to Connect");
-            document.getElementById("conn_stat").innerHTML= "<p> Failed to Connect to " + host + " on " + port+ "</p><p> Retrying Now";
-            conn_flag = 0;  
+            document.getElementById("conn_stat").innerHTML= "<p> Failed to Connect " + "</p><p> Retrying Now";
+            flag_connect = 0;  
             setTimeout(MQTTconnect, reconnectTimeout);
         } 
 
         function onLostConnection(){
             console.log("Connection dropped")
             document.getElementById("conn_stat").innerHTML= "Connection dropped: Re-Establishing Connection";
-            if (conn_flag == 1){ 
-                setTimeout(MQTTconnect, reconnectTimeout); 
-            }
+
+            if(SSL_count == 1){
+                Flag_SSL = true;
+            };
+
+            if(SSL_count ==0){
+                Flag_SSL = false;
+            };
+
+            if (flag_connect == 1){ 
+                console.log(Flag_SSL)
+                setTimeout(MQTTconnect(), reconnectTimeout); 
+            };
         } 
 
         function onMessageArrived(r_message){
@@ -96,6 +126,22 @@
         }
 
         function MQTTconnect() {
+
+            if (flag_connect == 2){
+                host = document.forms["connect_parameters"]["MQTT_host"].value;
+                port = Number(document.forms["connect_parameters"]["MQTT_port"].value);
+             
+                if (document.forms["connect_parameters"]["Use_SSL"].checked){
+                    Flag_SSL = true;
+                    SSL_count = 1;
+                }
+                if (!document.forms["connect_parameters"]["Use_SSL"].checked)
+                {
+                    Flag_SSL = false; 
+                    SSL_count = 0;
+                }
+            };
+
             console.log("Connecting to " + host + " on " + port);
             document.getElementById("conn_stat").innerHTML= "Connecting to " + host + " on " + port;
             mqtt = new Paho.MQTT.Client(host, port, "clientjs");
@@ -109,7 +155,9 @@
             mqtt.onConnectionLost = onLostConnection;
             mqtt.onMessageArrived = onMessageArrived;
 
-        mqtt.connect(options);
+        mqtt.connect(options); 
+
+        return false;
         
         } 
 
@@ -117,7 +165,7 @@
             console.log("Subscribing") 
             var sub_topic = document.forms["subscribe_topic"]["in_topic"].value;
             mqtt.subscribe(sub_topic)
-            console.log("Successfully subscribed to") //+ //sub_topic) 
+            console.log("Successfully subscribed to " + sub_topic) 
             return false
         }
 
@@ -131,17 +179,21 @@
     <div class = "row">
         <div class = "col-sm">
             <p></p>
-            <h3>Connection Status</h3>
+            <!--Connection Status-->
+            <h3>Connection Status</h3> 
             <p id = "conn_stat"></p>
-            <!--MQTT Start/End Buttons-->
-            <button class = "btn btn-success", onclick= "MQTTconnect()">Connect</button>
+            <p></p> 
+            <!--Connect Now Form-->
+            <p id = "conn_now"></p>
+
+            <!--Disconnect Button-->
             <button class = "btn btn-danger", onclick = "disconnect()">End Connection</button> 
-            <p><form name ="subscribe_topic", onsubmit="return subscribe()">
-                <input type="text", placeholder = "topic", name = "in_topic">
-                <p></p>
-                <p><button class = "btn btn-secondary">Topic Subscribe</button></p>
-            </form></p>           
-            <p></p>
+
+            <!--Subscribe to Topic Form (Show onConnect Function)--> 
+            <p id ="topic_subscribe"></p>       
+            <p></p> 
+
+            <!--Publish Message Form--> 
             <h3>Last Message</h3>
             <p id = "mess"></p>
             </p>
@@ -149,8 +201,9 @@
 
         <div id = "map" , class = "col-lg"></div>
 
-    <script> 
-        document.getElementById("conn_stat").innerHTML= "Not Connected, Default Host and Port: "+  host + " on " + port; 
+    <script>  
+        document.getElementById("conn_stat").innerHTML= "Not Connected"
+        document.getElementById("conn_now").innerHTML= toConnect_Form;  
         
         var map = L.map('map').setView([51.04440912510035, -114.06310212367659], 11); //Calgary Tower Coordinates (Obtained from Google Maps)
 
