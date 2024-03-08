@@ -112,7 +112,7 @@
         var Connected_Form = "<p></p>";
         var Disconnected_Form = "<p></p>";  
 
-        var Subscribe_Form = `<h3>Subscribe to Topic</h3> 
+        var Subscribe_Form = `<h3>Subscribe to a Topic</h3> 
             <p><form name ="subscribe_topic", onsubmit="return subscribe()">
             <input type="text", placeholder = "topic", name = "in_topic"> 
             <p></p>
@@ -121,8 +121,8 @@
 
         var Publish_Form = `<h3>Publish a Message</h3>
             <p><form name ="publish_message", onsubmit="return publish()">
-            <input type="text", placeholder = "topic", name = "topic"> 
-            <input type="text", placeholder = "message", name = "msg">
+            <p><input type="text", placeholder = "topic", name = "topic"></p> 
+            <p><input type="text", placeholder = "message", name = "msg"></p>
             <p></p>
             <p><button class = "btn btn-primary">Publish</button></p>
             </form></p>`;  
@@ -284,13 +284,19 @@
             navigator.geolocation.clearWatch(id);
         }  
 
-        function success(pos){
+        function onsuccess(pos){
             [lat, long, temp, markicon] = Userlocation(pos);
             popup_message = "My Temp is: " + temp
             var marker = L.marker([lat, long], {icon: markicon}).addTo(map).bindPopup(popup_message); 
 
 
+        }  
+
+        function onfailure(err){
+            console.log(err.code + err.message);
         }
+
+
 
         //Connected Functions 
 
@@ -299,7 +305,7 @@
             var sub_topic = document.forms["subscribe_topic"]["in_topic"].value;
             mqtt.subscribe(sub_topic) 
             if (sub_topic = Map_topic){
-                id = navigator.geolocation.getCurrentPosition(success);
+                id = navigator.geolocation.getCurrentPosition(onsuccess, onFailure, {enableHighAccuracy: true});
             }
             console.log("Successfully subscribed to " + sub_topic) 
             return false
@@ -323,7 +329,7 @@
         function share_status(){
             console.log("Sharing Status");
             //Get location data 
-            id = navigator.geolocation.getCurrentPosition(Sharesuccess);
+            id = navigator.geolocation.getCurrentPosition(Sharesuccess, onFailure, {enableHighAccuracy : true});
         } 
 
         
