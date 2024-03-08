@@ -68,14 +68,44 @@ i.Map Markers
    | Blue | -40 to 10 |
    | Green | 10.1 to 29.9 |
    | Red | 30 to 60 |
+
 2. Click on marker to view its exact temperature
 
-## Using MQTTX
+## Using MQTTX (Default Settings)
 
 a. Connect to MQTT Broker
 
+1. Click on "Add New Connection
+2. Host:
+
+   `wss://`
+
+   `test.mosquitto.org`
+
+3. Port: `8081`
+
+4. Path: `/mqtt`
+
+5. SSL/TLS: `On`
+
+6. SSL Secure:  `off`
+
+7. Certificate: `CA signed server certificate`
+
+8. Click on "Connect"
+
 b. Subscribe to MQTT Topic
+
+1. Click on "New Subscription"
+2. Enter desired topic
+3. Qos: `0`
 
 c. Publish a MQTT Message
 
+1. QoS `0`
+2. Enter desired topic
+3. Enter desired message
+
 ## Terms of Use
+
+The user agrees to only use the created website for personal use only. This license prohibits altering the created website without explicit concent from the creater.
