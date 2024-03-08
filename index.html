@@ -1,5 +1,6 @@
 <!DOCTYPE html> 
 <html>
+
 <head>
     <title>Phone Location and Temperature</title>
 
@@ -289,10 +290,10 @@
             popup_message = "My Temp is: " + temp
             var marker = L.marker([lat, long], {icon: markicon}).addTo(map).bindPopup(popup_message); 
 
-
         }  
 
         function onfailure(err){
+
             console.log(err.code + err.message);
         }
 
@@ -301,6 +302,7 @@
         //Connected Functions 
 
         function subscribe(){
+
             console.log("Subscribing") 
             var sub_topic = document.forms["subscribe_topic"]["in_topic"].value;
             mqtt.subscribe(sub_topic) 
@@ -312,6 +314,7 @@
         } 
 
         function publish(){
+
             console.log("publishing");
             var msg = document.forms["publish_message"]["msg"].value;
             var topic = document.forms["publish_message"]["topic"].value;
@@ -332,14 +335,15 @@
             id = navigator.geolocation.getCurrentPosition(Sharesuccess, onFailure, {enableHighAccuracy : true});
         } 
 
-        
 
     </script>
 
 </head>
 
 <body> 
+
     <h2> Phone Tracker App </h2>
+
     <div class = "row align-items-start">
         <div class = "col-auto">
             <p></p>
@@ -348,6 +352,7 @@
             <h3>Connection Status</h3> 
             <p id = "conn_stat"></p>
             <p></p> 
+            
             <!--Connect Now Form-->
             <p id = "conn_now"></p>
 
@@ -386,10 +391,8 @@
                 maxZoom: 18,
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map) 
 
-
-        //id = navigator.geolocation.getCurrentPosition(success);
-
     </script>
+
     </div>
 
 </body>
