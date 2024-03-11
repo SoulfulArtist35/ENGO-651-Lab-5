@@ -306,7 +306,7 @@
             console.log("Subscribing") 
             var sub_topic = document.forms["subscribe_topic"]["in_topic"].value;
             mqtt.subscribe(sub_topic) 
-            if (sub_topic = Map_topic){
+            if (sub_topic == Map_topic){
                 id = navigator.geolocation.getCurrentPosition(onsuccess, onFailure, {enableHighAccuracy: true});
             }
             console.log("Successfully subscribed to " + sub_topic) 

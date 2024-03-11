@@ -6,76 +6,109 @@
 
 ## Launching the Website
 
-a. Github Pages:
-    Simply visit `https://soulfulartist35.github.io/ENGO-651-Lab-5/`
+a. GitHub Pages:
+    Visit `https://soulfulartist35.github.io/ENGO-651-Lab-5/`
 
 b. VS Code:
 
-1. Click on file "index.html"
+1. Click on the file “index.html.”
 2. Press F5
 
 ## Using the Website
 
 a. Connecting to MQTT Broker
 
-1. Type in desire host, post and SSL or use provided defaults
-2. Click on "Connect"
-3. After connecting to the MQTT broker, the connect form will disappear
-4. Connected options (Share Status, Subscribe, Publish) will appear on the screen
+1. Type in the desired host, post, and SSL, or use the provided defaults
+
+   ![alt text](Readme_photos/image-1.png)
+
+2. Click on “Connect.”
+
+   ![alt text](Readme_photos/image-2.png)
+
+3. After connecting to the MQTT broker, the connect form will disappear, and the connected options (Share Status, Subscribe, Publish) will appear on the screen
+
+   ![alt text](Readme_photos/image-3.png)
 
 b. Disconnecting to MQTT Broker
 
-1. Click on "End Connection"
-2. The connect form asking for host, port and SSL will reappear
+1. Click on “End Connection”
+
+   ![alt text](Readme_photos/image-4.png)
+
+2. The to connect form asking for host, port, and SSL will reappear
+
+   ![alt text](Readme_photos/image-5.png)
 
 c. Connection Status
 
-There is a status bar at the top of the webpage below the main heading. It primary function is to inform the user the status of the connection. The console also informs the user about the connection status
+A status bar is at the top of the webpage below the main heading. Its primary function is to inform the User of the status of the connection. The console also informs the User about the connection status.
 
 | Status | Meaning |
 |----|----|
 | Not Connected | MQTT has never connected in instance |
-| Connected | Currently connect to MQTT broker |
+| Connected | Currently connected to MQTT broker |
 | Disconnected | User has disconnected session |
 | Connection Drop | Lost connection with broker |
 
 d. Subscribing to MQTT Topic
 
-1. Enter desired MQTT Topic into subscription form
-2. Click on "Topic subscribe"
+1. Enter the desired MQTT Topic into the subscription form
 
-f. Publish a MQTT Message
+   ![alt text](Readme_photos/image-6.png)
 
-1. Enter desired MQTT Topic into publish form
-2. Enter desired MQTT message
-3. Click on "Publish"
+2. Click on “Topic subscribe.”
+  
+f. Publish an MQTT Message
+
+1. Enter the desired MQTT Topic and desired MQTT message into the “Publish a Message,” form
+
+   ![alt text](Readme_photos/image-7.png)
+
+2. Click on “Publish.” If the User has subscribed to the topic, you will receive a message.
+
+   ![alt text](Readme_photos/image-8.png)
 
 g. View Location on Map
 
 1. Subscribe to `ENGO651/Ryan/my_temp` by following instructions in d.
-2. Location will appear on the map
+
+2. Location will appear on the Map
+
+   ![alt text](Readme_photos/image-9.png)
+   ![alt text](Readme_photos/image-10.png)
 
 h. Share MQTT Location
 
-1. Click on "Share my Status"
+1. Click on “Share my Status”
+
+   ![alt text](Readme_photos/image-11.png)
+
 2. Allow location sharing
 
-i.Map Markers
+   ![alt text](Readme_photos/image-12.png)
+   ![alt text](Readme_photos/image-13.png)
 
-1. Marker color will indicate temperature
+i. Map Markers
+
+1. The marker color will indicate the temperature
    | Color | Temperature |
    |---|---|
    | Blue | -40 to 10 |
    | Green | 10.1 to 29.9 |
    | Red | 30 to 60 |
 
-2. Click on marker to view its exact temperature
+2. Click on the marker to view its exact temperature
 
+   ![alt text](Readme_photos/image-14.png)
+  
 ## Using MQTTX (Default Settings)
 
 a. Connect to MQTT Broker
 
-1. Click on "Add New Connection
+   ![alt text](Readme_photos/image-15.png)
+  
+1. Click on “Add New Connection."
 2. Host:
 
    `wss://`
@@ -90,22 +123,31 @@ a. Connect to MQTT Broker
 
 6. SSL Secure:  `off`
 
-7. Certificate: `CA signed server certificate`
+7. Certificate: `CA-signed server certificate`
 
-8. Click on "Connect"
+8. Click on “Connect.”
 
 b. Subscribe to MQTT Topic
 
-1. Click on "New Subscription"
+1. Click on “New Subscription.”
+
+   ![alt text](Readme_photos/image-16.png)
+   ![alt text](Readme_photos/image-17.png)
+
 2. Enter desired topic
 3. Qos: `0`
 
-c. Publish a MQTT Message
+c. Publish an MQTT Message
+
+   ![alt text](Readme_photos/image-18.png)
 
 1. QoS `0`
 2. Enter desired topic
 3. Enter desired message
 
+   ![alt text](Readme_photos/image-19.png)
+   ![alt text](Readme_photos/image-20.png)
+
 ## Terms of Use
 
-The user agrees to only use the created website for personal use only. This license prohibits altering the created website without explicit concent from the creater.
+The User agrees to use only the created website for personal use. This license prohibits altering the created website without explicit consent from the creator. There is no warranty on the software.
