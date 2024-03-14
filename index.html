@@ -154,13 +154,17 @@
 
         //Connected Functions 
         function ping(){
-            console.log("pinging");
-            msg = "ping";
-            var topic = ping_topic;
-            message = new Paho.MQTT.Message(msg);
-            message.destinationName = topic;
-            mqtt.send(message);
-            console.log("Ping Sent"); 
+            try{
+                console.log("pinging");
+                msg = "ping";
+                var topic = ping_topic;
+                message = new Paho.MQTT.Message(msg);
+                message.destinationName = topic;
+                mqtt.send(message);
+                console.log("Ping Sent"); }
+            catch{
+                console.log("No Ping (Disconnected)")
+            }
 
         }
 
