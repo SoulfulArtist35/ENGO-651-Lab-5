@@ -143,7 +143,8 @@
         var port; 
         var Flag_SSL = true; 
         var SSL_count; 
-        var Map_topic = 'ENGO651/Ryan/my_temp'; 
+        var Map_topic = 'ENGO651/Ryan/my_temp';
+        var ping_topic =  'ENGO651/Ryan/ping';
 
         var clientID = "Client-" + Math.floor(Math.random()*1000000); 
 
@@ -152,6 +153,16 @@
         var client_layer = new L.LayerGroup()
 
         //Connected Functions 
+        function ping(){
+            console.log("pinging");
+            msg = "ping";
+            var topic = ping_topic;
+            message = new Paho.MQTT.Message(msg);
+            message.destinationName = topic;
+            mqtt.send(message);
+            console.log("Ping Sent"); 
+
+        }
 
         function subscribe(){
 
@@ -159,7 +170,7 @@
             var sub_topic = document.forms["subscribe_topic"]["in_topic"].value;
             mqtt.subscribe(sub_topic) 
             if (sub_topic == Map_topic){
-                id = navigator.geolocation.getCurrentPosition(onsuccess, onFailure, {enableHighAccuracy: true});
+                id = navigator.geolocation.watchPosition(onsuccess, onFailure, {enableHighAccuracy: true});
             }
             console.log("Successfully subscribed to " + sub_topic) 
             return false
@@ -242,13 +253,17 @@
         //MQTT Functions
         function onConnect(){
 
-            console.log("Subscribing to Get Location Data") 
-            mqtt.subscribe(Map_topic) 
-            id = navigator.geolocation.getCurrentPosition(onsuccess, onFailure, {enableHighAccuracy: true});
-            console.log("Successfully subscribed to " + Map_topic) 
+            console.log("Subscribing to Get Location Data"); 
+            mqtt.subscribe(Map_topic);
+            mqtt.subscribe(ping_topic);
+            id = navigator.geolocation.watchPosition(onsuccess, onFailure, {enableHighAccuracy: true});
+            console.log("Successfully subscribed to " + Map_topic)  
                     
             //Change View of Webpage
             Connected_View();
+
+            //Send Ping to keep connection active
+            setInterval(ping, 50000 ); //50 sec
 
             flag_connect = 1;
         } 
@@ -337,12 +352,16 @@
                 } 
 
                 }
-            }
-            else{
+            } 
+            if (!(topic == Map_topic || topic == ping_topic)){
                 console.log(msg);
                 document.getElementById("mess").innerHTML= '<h3>Last Message</h3>' + "<p>Topic: "+ topic+ "</p>Message: " + msg + "</p>"
-            }
-        }
+            } 
+
+            if(topic == ping_topic)
+                console.log("ping received")
+        } 
+
 
         function MQTTconnect() {
 
@@ -387,8 +406,6 @@
         return false;
         
         }  
-
-
 
     </script>
 
@@ -444,6 +461,8 @@
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 18,
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map) 
+
+        
 
     </script>
 
