@@ -145,11 +145,11 @@
         var SSL_count; 
         var Map_topic = 'ENGO651/Ryan/my_temp'; 
 
-        var clientID = "clientjs" + Math.floor(Math.random()*1000000); 
+        var clientID = "Client-" + Math.floor(Math.random()*1000000); 
 
         var Active_client = [clientID];
         var Layer_dict = []; 
-        var client_layer = new L.featureGroup()
+        var client_layer = new L.LayerGroup()
 
         //Connected Functions 
 
@@ -209,7 +209,7 @@
             //Generate GeoJSON Message
             var Geomsg = `{ "type": "Feature", 
                 "geometry": { "type": "Point", "coordinates" : [${lat}, ${long}] },
-                 "properties": {"temp": ${temp}, "ID" : ${clientID}}}`
+                 "properties": {"temp": ${temp}, "ID" : "${clientID}"}}`
             
             //Publish Message
             message = message = new Paho.MQTT.Message(Geomsg);
@@ -225,8 +225,11 @@
 
             //Reset Map for New Location
             map.removeLayer(client_layer);
-            client_layer = new L.featureGroup()
+            client_layer = new L.LayerGroup()
             var marker = L.marker([lat, long], {icon: markicon}).addTo(client_layer).bindPopup(popup_message); 
+            Layer_dict.push({
+                        "ID" : clientID, "properties" : {"Layer" : client_layer} 
+                    })
             map.addLayer(client_layer)
 
         }  
@@ -279,7 +282,6 @@
             };
 
             if (flag_connect == 1){ 
-                console.log(Flag_SSL)
                 setTimeout(MQTTconnect(), reconnectTimeout); 
             };
         }  
@@ -293,19 +295,48 @@
                 var coords = msg["geometry"]['coordinates'];
                 var temp = msg["properties"]["temp"]; 
                 var id = msg["properties"]["ID"];
-                var popup_message = "<p> My Temp is: " + temp + "</p><p>Client: " + clientID + "</p>" 
+                var popup_message = "<p> My Temp is: " + temp + "</p><p> Client: " + id + "</p>" 
                 markicon = Iconcolor(temp); 
-                if (!Active_client.includes(id)){
+                var others_layer = new L.featureGroup();
+
+                
+                if (Active_client.includes(id) == false){
+
                     Active_client.push(id);
-                    var others_layer = new L.featureGroup();
+                    var marker = L.marker(coords, {icon: markicon}).addTo(others_layer).bindPopup(popup_message); 
                     Layer_dict.push({
                         "ID" : id, "properties" : {"Layer" : others_layer} 
-                    })
-                    console.log(Layer_dict)
+                    })  
+                    map.addLayer(others_layer);
+                    
                 } 
-                /////Edit Here to Delete previous location marker if from client
-                var marker = L.marker(coords, {icon: markicon}).addTo(map).bindPopup(popup_message); 
+                else{
+                    if (id != clientID){
+                        //Loop through Layer_dict to find the correct layer 
+                        for (var ele in Layer_dict){
+                            if (Layer_dict[ele]["ID"] == id){
+                                var layer_id = Layer_dict[ele]
+                                break
+                            };  
+                            
+                        }  
+                        map.removeLayer(layer_id["properties"]["Layer"]) 
 
+                        console.log(ele)
+
+                        var marker = L.marker(coords, {icon: markicon}).addTo(others_layer).bindPopup(popup_message); 
+                        layer_id["properties"]["Layer"] = others_layer; 
+                        map.addLayer(layer_id["properties"]["Layer"])  
+                     }
+                
+                    else{
+                        map.removeLayer(client_layer);
+                        client_layer = new L.LayerGroup();
+                        var marker = L.marker(coords, {icon: markicon}).addTo(client_layer).bindPopup(popup_message);
+                        map.addLayer(client_layer);
+                } 
+
+                }
             }
             else{
                 console.log(msg);
