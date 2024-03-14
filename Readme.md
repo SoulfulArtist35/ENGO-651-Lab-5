@@ -28,9 +28,13 @@ a. Connecting to MQTT Broker
 
    ![alt text](Readme_photos/image-2.png)
 
-3. After connecting to the MQTT broker, the connect form will disappear, and the connected options (Share Status, Subscribe, Publish) will appear on the screen
+3. Allow Location Sharing
 
-   ![alt text](Readme_photos/image-3.png)
+   ![alt text](Readme_photos/image-12.png)
+
+4. After connecting to the MQTT broker, the connect form will disappear, and the connected options (Share Status, Subscribe, Publish) will appear on the screen. Also your location will appear on the map and follow wherever you go.
+
+   ![alt text](Readme_photos/image-21.png)
 
 b. Disconnecting to MQTT Broker
 
@@ -71,16 +75,16 @@ f. Publish an MQTT Message
 
    ![alt text](Readme_photos/image-8.png)
 
-g. View Location on Map
+g. Alternative Method to View Location on Map
 
 1. Subscribe to `ENGO651/Ryan/my_temp` by following instructions in d.
 
-2. Location will appear on the Map
+2. Location will appear on the map after approving location sharing
 
-   ![alt text](Readme_photos/image-9.png)
+   ![alt text](Readme_photos/image-12.png)
    ![alt text](Readme_photos/image-10.png)
 
-h. Share MQTT Location
+h. Share User Location
 
 1. Click on “Share my Status”
 
@@ -102,7 +106,7 @@ i. Map Markers
 
 2. Click on the marker to view its exact temperature
 
-   ![alt text](Readme_photos/image-14.png)
+   ![alt text](Readme_photos/image-14.png) //Change
   
 ## Using MQTTX (Default Settings)
 
