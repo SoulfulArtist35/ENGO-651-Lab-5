@@ -154,7 +154,7 @@
 
         //Connected Functions 
         function ping(){
-            try{
+            if (flag_connect == 1 ){
                 console.log("pinging");
                 msg = "ping";
                 var topic = ping_topic;
@@ -162,7 +162,8 @@
                 message.destinationName = topic;
                 mqtt.send(message);
                 console.log("Ping Sent"); }
-            catch{
+
+            else{
                 console.log("No Ping (Disconnected)")
             }
 
@@ -264,12 +265,13 @@
             console.log("Successfully subscribed to " + Map_topic)  
                     
             //Change View of Webpage
-            Connected_View();
+            Connected_View(); 
+
+            flag_connect = 1;
 
             //Send Ping to keep connection active
             setInterval(ping, 50000 ); //50 sec
 
-            flag_connect = 1;
         } 
         
         function disconnect(){
