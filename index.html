@@ -143,13 +143,102 @@
         var port; 
         var Flag_SSL = true; 
         var SSL_count; 
-        var Map_topic = 'ENGO651/Ryan/my_temp';
+        var Map_topic = 'ENGO651/Ryan/my_temp'; 
+
+        var clientID = "clientjs" + Math.floor(Math.random()*1000000); 
+
+        var Active_client = [];
+        var Layer_dict = [];
+
+        //Connected Functions 
+
+        function subscribe(){
+
+            console.log("Subscribing") 
+            var sub_topic = document.forms["subscribe_topic"]["in_topic"].value;
+            mqtt.subscribe(sub_topic) 
+            if (sub_topic == Map_topic){
+                id = navigator.geolocation.getCurrentPosition(onsuccess, onFailure, {enableHighAccuracy: true});
+            }
+            console.log("Successfully subscribed to " + sub_topic) 
+            return false
+        } 
+
+        function publish(){
+
+            console.log("publishing");
+            var msg = document.forms["publish_message"]["msg"].value;
+            var topic = document.forms["publish_message"]["topic"].value;
+            if (topic == ""){
+                topic = "Ryan/testing"
+            }
+            message = new Paho.MQTT.Message(msg);
+            message.destinationName = topic;
+            mqtt.send(message);
+            console.log("Successfully Sent"); 
+
+            return false
+        }
+
+        function share_status(){
+            console.log("Sharing Status");
+            //Get location data 
+            id = navigator.geolocation.getCurrentPosition(Sharesuccess, onFailure, {enableHighAccuracy : true});
+        } 
+
+        //Geospatial Functions 
+
+        function Userlocation(pos){
+            //User Location
+            lat = pos["coords"]["latitude"];
+            long = pos["coords"]["longitude"];
+
+            //Temp (Create a random value between -40 and 60 (deg C) to 0.1 deg accuracy) 
+            temp = Math.round(Math.random()*1000-400)/10;  
+
+            markicon = Iconcolor(temp);
+
+            return [lat, long, temp, markicon]
+        }
+
+        //Obtain Device Position      
+        function Sharesuccess(pos) {
+            [lat, long, temp, markicon] = Userlocation(pos);
+
+            //Generate GeoJSON Message
+            var Geomsg = `{ "type": "Feature", 
+                "geometry": { "type": "Point", "coordinates" : [${lat}, ${long}] },
+                 "properties": {"temp": ${temp}, "ID" : ${clientID}}}`
+            
+            //Publish Message
+            message = message = new Paho.MQTT.Message(Geomsg);
+            message.destinationName = Map_topic;
+            mqtt.send(message);
+
+            navigator.geolocation.clearWatch(id);
+        }  
+
+        function onsuccess(pos){ //User's Own Location
+            [lat, long, temp, markicon] = Userlocation(pos);
+            popup_message = "My Temp is: " + temp 
+            //edit to put on user's own layer 
+            var marker = L.marker([lat, long], {icon: markicon}).addTo(map).bindPopup(popup_message); 
+
+        }  
+
+        function onfailure(err){
+
+            console.log(err.code + err.message);
+        }
 
         //MQTT Functions
         function onConnect(){
 
-            mqtt.subscribe(Map_topic)// Automatically subscribe to map topic
-
+            console.log("Subscribing to Get Location Data") 
+            mqtt.subscribe(Map_topic) 
+            id = navigator.geolocation.getCurrentPosition(onsuccess, onFailure, {enableHighAccuracy: true});
+            console.log("Successfully subscribed to " + Map_topic) 
+                    
             //Change View of Webpage
             Connected_View();
 
@@ -188,7 +277,7 @@
                 console.log(Flag_SSL)
                 setTimeout(MQTTconnect(), reconnectTimeout); 
             };
-        } 
+        }  
 
         function onMessageArrival(r_message){
             msg = r_message.payloadString;
@@ -200,7 +289,7 @@
                 var temp = msg["properties"]["temp"];
                 popup_message = "My Temp is: " + temp
                 markicon = Iconcolor(temp);
-
+                /////Edit Here to Delete previous location marker if from client
                 var marker = L.marker(coords, {icon: markicon}).addTo(map).bindPopup(popup_message); 
 
             }
@@ -255,85 +344,6 @@
         
         }  
 
-        function Userlocation(pos){
-            //User Location
-            lat = pos["coords"]["latitude"];
-            long = pos["coords"]["longitude"];
-
-            //Temp (Create a random value between -40 and 60 (deg C) to 0.1 deg accuracy) 
-            temp = Math.round(Math.random()*1000-400)/10;  
-
-            markicon = Iconcolor(temp);
-
-            return [lat, long, temp, markicon]
-        }
-
-        //Obtain Device Position      
-        function Sharesuccess(pos) {
-            [lat, long, temp, markicon] = Userlocation(pos);
-
-            //Generate GeoJSON Message
-            var Geomsg = `{ "type": "Feature", 
-                "geometry": { "type": "Point", "coordinates" : [${lat}, ${long}] },
-                 "properties": {"temp": ${temp}}}`
-            
-            //Publish Message
-            message = message = new Paho.MQTT.Message(Geomsg);
-            message.destinationName = Map_topic;
-            mqtt.send(message);
-
-            navigator.geolocation.clearWatch(id);
-        }  
-
-        function onsuccess(pos){
-            [lat, long, temp, markicon] = Userlocation(pos);
-            popup_message = "My Temp is: " + temp
-            var marker = L.marker([lat, long], {icon: markicon}).addTo(map).bindPopup(popup_message); 
-
-        }  
-
-        function onfailure(err){
-
-            console.log(err.code + err.message);
-        }
-
-
-
-        //Connected Functions 
-
-        function subscribe(){
-
-            console.log("Subscribing") 
-            var sub_topic = document.forms["subscribe_topic"]["in_topic"].value;
-            mqtt.subscribe(sub_topic) 
-            if (sub_topic == Map_topic){
-                id = navigator.geolocation.getCurrentPosition(onsuccess, onFailure, {enableHighAccuracy: true});
-            }
-            console.log("Successfully subscribed to " + sub_topic) 
-            return false
-        } 
-
-        function publish(){
-
-            console.log("publishing");
-            var msg = document.forms["publish_message"]["msg"].value;
-            var topic = document.forms["publish_message"]["topic"].value;
-            if (topic == ""){
-                topic = "Ryan/testing"
-            }
-            message = new Paho.MQTT.Message(msg);
-            message.destinationName = topic;
-            mqtt.send(message);
-            console.log("Successfully Sent"); 
-
-            return false
-        }
-
-        function share_status(){
-            console.log("Sharing Status");
-            //Get location data 
-            id = navigator.geolocation.getCurrentPosition(Sharesuccess, onFailure, {enableHighAccuracy : true});
-        } 
 
 
     </script>
