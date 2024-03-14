@@ -148,7 +148,8 @@
         var clientID = "clientjs" + Math.floor(Math.random()*1000000); 
 
         var Active_client = [];
-        var Layer_dict = [];
+        var Layer_dict = []; 
+        var client_layer = new L.featureGroup()
 
         //Connected Functions 
 
@@ -220,9 +221,13 @@
 
         function onsuccess(pos){ //User's Own Location
             [lat, long, temp, markicon] = Userlocation(pos);
-            popup_message = "My Temp is: " + temp 
-            //edit to put on user's own layer 
-            var marker = L.marker([lat, long], {icon: markicon}).addTo(map).bindPopup(popup_message); 
+            var popup_message = "<p> My Temp is: " + temp + "</p><p>Client: " + clientID + "</p>" 
+
+            //Reset Map for New Location
+            map.removeLayer(client_layer);
+            client_layer = new L.featureGroup()
+            var marker = L.marker([lat, long], {icon: markicon}).addTo(client_layer).bindPopup(popup_message); 
+            map.addLayer(client_layer)
 
         }  
 
