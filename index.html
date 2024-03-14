@@ -147,7 +147,7 @@
 
         var clientID = "clientjs" + Math.floor(Math.random()*1000000); 
 
-        var Active_client = [];
+        var Active_client = [clientID];
         var Layer_dict = []; 
         var client_layer = new L.featureGroup()
 
@@ -219,7 +219,7 @@
             navigator.geolocation.clearWatch(id);
         }  
 
-        function onsuccess(pos){ //User's Own Location
+        function onsuccess(pos){ //Client's Own Location
             [lat, long, temp, markicon] = Userlocation(pos);
             var popup_message = "<p> My Temp is: " + temp + "</p><p>Client: " + clientID + "</p>" 
 
@@ -291,9 +291,18 @@
                 //Get Information out of JSON
                 msg = JSON.parse(msg);
                 var coords = msg["geometry"]['coordinates'];
-                var temp = msg["properties"]["temp"];
-                popup_message = "My Temp is: " + temp
-                markicon = Iconcolor(temp);
+                var temp = msg["properties"]["temp"]; 
+                var id = msg["properties"]["ID"];
+                var popup_message = "<p> My Temp is: " + temp + "</p><p>Client: " + clientID + "</p>" 
+                markicon = Iconcolor(temp); 
+                if (!Active_client.includes(id)){
+                    Active_client.push(id);
+                    var others_layer = new L.featureGroup();
+                    Layer_dict.push({
+                        "ID" : id, "properties" : {"Layer" : others_layer} 
+                    })
+                    console.log(Layer_dict)
+                } 
                 /////Edit Here to Delete previous location marker if from client
                 var marker = L.marker(coords, {icon: markicon}).addTo(map).bindPopup(popup_message); 
 
