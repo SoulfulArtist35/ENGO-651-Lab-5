@@ -6,6 +6,8 @@
 
 This website has a rudimentary layout. It only has one HTML page, which dynamically changes based on the user input. The required functions for the webpage’s JavaScript components are in the header. The body of the HTML file serves as a general template for the JavaScript functions to alter based on the User’s input.
 
+`Youtube Screencast:`
+
 ## Launching the Website
 
 a. GitHub Pages:
@@ -157,3 +159,9 @@ c. Publish an MQTT Message
 ## Terms of Use
 
 The User agrees to use only the created website for personal use. This license prohibits altering the created website without explicit consent from the creator. There is no warranty on the software.
+
+## References
+
+1.  
+2. V. Agafonkin, CloudMade and T. Pointhuber, "Leaflet-Color-Markers." n.d.
+   [Online]. Available: `https://github.com/pointhi/leaflet-color-markers?tab=readme-ov-file`
