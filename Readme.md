@@ -6,8 +6,6 @@
 
 This website has a rudimentary layout. It only has one HTML page, which dynamically changes based on the user input. The required functions for the webpage’s JavaScript components are in the header. The body of the HTML file serves as a general template for the JavaScript functions to alter based on the User’s input.
 
-`Youtube Screencast:`
-
 ## Launching the Website
 
 a. GitHub Pages:
