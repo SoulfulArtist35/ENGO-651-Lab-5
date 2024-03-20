@@ -162,6 +162,7 @@ The User agrees to use only the created website for personal use. This license p
 
 ## References
 
-1.  
+1. S. Cope. "JavaScript Websockets." Steve's Internet Guide. `http://www.steves-internet-guide.com/download/            javascript-websockets/` (retrieved Mar 19, 2024)
+
 2. V. Agafonkin, CloudMade and T. Pointhuber, "Leaflet-Color-Markers." n.d.
-   [Online]. Available: `https://github.com/pointhi/leaflet-color-markers?tab=readme-ov-file`
+[Online]. Available: `https://github.com/pointhi/leaflet-color-markers?tab=readme-ov-file`
